@@ -305,6 +305,7 @@ export default function SearchScreen() {
           )}
           keyExtractor={(item) => item.slug}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
           contentContainerStyle={styles.resultsList}
         />
       </Animated.View>

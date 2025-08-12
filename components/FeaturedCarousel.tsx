@@ -49,7 +49,7 @@ export default function FeaturedCarousel({
   const colorScheme = useColorScheme();
   const scrollX = useSharedValue(0);
   const currentIndex = useSharedValue(0);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const colors = {
     light: {
@@ -73,16 +73,16 @@ export default function FeaturedCarousel({
   const startAutoScroll = () => {
     if (!autoScroll || items.length <= 1) return;
     
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = (setInterval(() => {
       const nextIndex = (currentIndex.value + 1) % items.length;
       currentIndex.value = nextIndex;
       scrollX.value = withTiming(nextIndex * CARD_WIDTH, { duration: 500 });
-    }, 4000);
+    }, 4000) as unknown) as NodeJS.Timeout;
   };
 
   const stopAutoScroll = () => {
     if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+      clearInterval(intervalRef.current as unknown as number);
     }
   };
 
@@ -143,7 +143,7 @@ export default function FeaturedCarousel({
           />
           
           <LinearGradient
-            colors={theme.overlay}
+            colors={[theme.overlay[0] as any, theme.overlay[1] as any]}
             style={styles.gradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}

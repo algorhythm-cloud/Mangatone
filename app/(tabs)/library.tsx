@@ -306,6 +306,7 @@ export default function LibraryScreen() {
           numColumns={2}
           columnWrapperStyle={styles.libraryRow}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
           contentContainerStyle={styles.libraryList}
         />
       </Animated.View>

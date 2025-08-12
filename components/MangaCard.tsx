@@ -360,6 +360,7 @@ const styles = StyleSheet.create({
   gridImage: {
     width: "100%",
     height: "100%",
+    resizeMode: "cover",
   },
   gridContent: {
     padding: 12,
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
   listImageContainer: {
     position: "relative",
     width: 80,
-    height: 100,
+    height: 112,
     borderRadius: 8,
     overflow: "hidden",
     marginRight: 12,
@@ -399,6 +400,7 @@ const styles = StyleSheet.create({
   listImage: {
     width: "100%",
     height: "100%",
+    resizeMode: "cover",
   },
   listContent: {
     flex: 1,
