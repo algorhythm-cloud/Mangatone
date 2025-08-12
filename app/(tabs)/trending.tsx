@@ -279,28 +279,29 @@ export default function TrendingScreen() {
                     style={styles.trendingCard}
                   />
                 </View>
-
-                <View style={styles.trendingStats}>
-                  <View style={styles.statItem}>
-                    <Ionicons name="eye" size={14} color={theme.textSecondary} />
-                    <Text style={[styles.statText, { color: theme.textSecondary }]}>
-                      {Math.floor(Math.random() * 1000)}K
-                    </Text>
-                  </View>
-                  <View style={styles.statItem}>
-                    <Ionicons name="heart" size={14} color={theme.trending} />
-                    <Text style={[styles.statText, { color: theme.textSecondary }]}>
-                      {Math.floor(Math.random() * 100)}K
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-          keyExtractor={(item) => item.slug}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.trendingList}
-        />
+ 
+                 <View style={styles.trendingStats}>
+                   <View style={styles.statItem}>
+                     <Ionicons name="eye" size={14} color={theme.textSecondary} />
+                     <Text style={[styles.statText, { color: theme.textSecondary }]}>
+                       {Math.floor(Math.random() * 1000)}K
+                     </Text>
+                   </View>
+                   <View style={styles.statItem}>
+                     <Ionicons name="heart" size={14} color={theme.trending} />
+                     <Text style={[styles.statText, { color: theme.textSecondary }]}>
+                       {Math.floor(Math.random() * 100)}K
+                     </Text>
+                   </View>
+                 </View>
+               </TouchableOpacity>
+             </Animated.View>
+           )}
+           keyExtractor={(item) => item.slug}
+           showsVerticalScrollIndicator={false}
+           scrollEnabled={false}
+           contentContainerStyle={styles.trendingList}
+         />
       </Animated.View>
     );
   };

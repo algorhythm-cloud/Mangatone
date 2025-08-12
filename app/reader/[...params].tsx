@@ -11,12 +11,12 @@ import {
   StatusBar,
   Alert,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   useSharedValue,
@@ -29,6 +29,7 @@ import Animated, {
   Extrapolate,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import ReaderImage from "@/components/ReaderImage";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -49,7 +50,7 @@ export default function ReaderScreen() {
   const controlsOpacity = useSharedValue(1);
   const settingsTranslateY = useSharedValue(300);
   const scrollY = useSharedValue(0);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<FlatList<any> | null>(null);
 
   const getChapterImages = useAction(api.manga.getChapterImages);
 
@@ -127,13 +128,14 @@ export default function ReaderScreen() {
     });
   };
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-      const progress = event.contentOffset.y / (event.contentSize.height - event.layoutMeasurement.height);
-      runOnJS(setScrollProgress)(Math.max(0, Math.min(1, progress)));
-    },
-  });
+  // Deprecated: previously used for ScrollView. Progress is now handled in FlatList onScroll.
+  // const scrollHandler = useAnimatedScrollHandler({
+  //   onScroll: (event) => {
+  //     scrollY.value = event.contentOffset.y;
+  //     const progress = event.contentOffset.y / (event.contentSize.height - event.layoutMeasurement.height);
+  //     runOnJS(setScrollProgress)(Math.max(0, Math.min(1, progress)));
+  //   },
+  // });
 
   const controlsAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -358,46 +360,33 @@ export default function ReaderScreen() {
     }
 
     return (
-      <Animated.ScrollView
-        ref={scrollViewRef}
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        onScroll={scrollHandler}
+      <FlatList
+        ref={scrollViewRef as any}
+        data={chapterData.images}
+        keyExtractor={(item: any, idx: number) => `${item.url}-${idx}`}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity activeOpacity={1} onPress={toggleControls}>
+            <ReaderImage uri={item.url} index={index} />
+          </TouchableOpacity>
+        )}
+        onScroll={(e) => {
+          // replicate previous scroll progress logic
+          const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+          const progress = contentOffset.y / Math.max(1, contentSize.height - layoutMeasurement.height);
+          setScrollProgress(Math.max(0, Math.min(1, progress)));
+        }}
         scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
         bounces={false}
-      >
-        <TouchableOpacity
-          style={styles.tapArea}
-          onPress={toggleControls}
-          activeOpacity={1}
-        >
-          {chapterData.images.map((image: any, index: number) => (
-            <View key={index} style={styles.imageContainer}>
-              <Image
-                source={{ uri: image.url }}
-                style={styles.mangaImage}
-                contentFit="contain"
-                transition={300}
-                placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-                onLoad={() => {
-                  if (Platform.OS !== "web") {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  }
-                }}
-              />
-            </View>
-          ))}
-          
-          {/* End of chapter indicator */}
-          <View style={[styles.endOfChapter, { backgroundColor: theme.surface }]}>
+        ListFooterComponent={
+          <View style={[styles.endOfChapter, { backgroundColor: theme.surface }]}> 
             <Ionicons name="checkmark-circle" size={48} color={theme.primary} />
-            <Text style={[styles.endTitle, { color: theme.text }]}>
+            <Text style={[styles.endTitle, { color: theme.text }]}> 
               Chapter Complete!
             </Text>
-            <Text style={[styles.endSubtitle, { color: theme.textSecondary }]}>
+            <Text style={[styles.endSubtitle, { color: theme.textSecondary }]}> 
               You've reached the end of this chapter
             </Text>
-            
             <View style={styles.endActions}>
               <TouchableOpacity
                 style={[styles.endButton, { backgroundColor: theme.primary }]}
@@ -408,7 +397,6 @@ export default function ReaderScreen() {
                 <Text style={styles.endButtonText}>Next Chapter</Text>
                 <Ionicons name="chevron-forward" size={20} color="white" />
               </TouchableOpacity>
-              
               <TouchableOpacity
                 style={[styles.endButton, { backgroundColor: theme.background, borderColor: theme.primary, borderWidth: 1 }]}
                 onPress={() => router.back()}
@@ -417,8 +405,8 @@ export default function ReaderScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </TouchableOpacity>
-      </Animated.ScrollView>
+        }
+      />
     );
   };
 
@@ -492,8 +480,6 @@ const styles = StyleSheet.create({
   },
   mangaImage: {
     width: screenWidth,
-    minHeight: screenHeight * 0.8,
-    maxHeight: screenHeight * 3,
   },
   topControls: {
     position: "absolute",
