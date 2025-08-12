@@ -3,7 +3,7 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 
-const API_BASE_URL = "https://kingofshojo-v2.vercel.app";
+const API_BASE_URL = "https://v0-kingofshojo-api.vercel.app";
 
 // Get homepage content
 export const getHomepage = action({
